@@ -1,0 +1,205 @@
+### TaskNest REST Client API Requests
+@baseUrl = http://localhost:5000/api
+@token = YOUR_JWT_TOKEN_HERE
+@orgId = YOUR_ORGANIZATION_ID_HERE
+@projectId = YOUR_PROJECT_ID_HERE
+@taskId = YOUR_TASK_ID_HERE
+
+### 1. AUTHENTICATION
+
+# Login as Owner
+# @name loginOwner
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "owner@test.com",
+  "password": "123456"
+}
+
+### Login as Admin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@test.com",
+  "password": "123456"
+}
+
+### Login as Member
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "member@test.com",
+  "password": "123456"
+}
+
+### Login as Viewer
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "viewer@test.com",
+  "password": "123456"
+}
+
+### Get Current User Profile
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### 2. ORGANIZATIONS
+
+# Create Organization
+POST {{baseUrl}}/organizations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "New Tech Corp"
+}
+
+### Get User Organizations
+GET {{baseUrl}}/organizations
+Authorization: Bearer {{token}}
+
+### Get Organization Members
+GET {{baseUrl}}/organizations/{{orgId}}/members
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Add Member to Organization
+POST {{baseUrl}}/organizations/{{orgId}}/members
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "email": "member@test.com",
+  "role": "MEMBER"
+}
+
+### Update Member Role
+PATCH {{baseUrl}}/organizations/{{orgId}}/members/TARGET_USER_ID
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "role": "ADMIN"
+}
+
+### Remove Member
+DELETE {{baseUrl}}/organizations/{{orgId}}/members/TARGET_USER_ID
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### 3. PROJECTS
+
+# Create Project (Admin/Owner only)
+POST {{baseUrl}}/projects
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "name": "AI Assistant Dashboard",
+  "description": "Building high-performance agent dashboard",
+  "organizationId": "{{orgId}}"
+}
+
+### List Projects in Organization
+GET {{baseUrl}}/projects?organizationId={{orgId}}
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Get Project Details
+GET {{baseUrl}}/projects/{{projectId}}
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### 4. TASKS
+
+# Create Task (Member/Admin/Owner)
+POST {{baseUrl}}/tasks
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "title": "Design System Implementation",
+  "description": "Create Tailwind CSS design tokens and UI components",
+  "status": "TODO",
+  "priority": "HIGH",
+  "labels": ["ui", "frontend"],
+  "projectId": "{{projectId}}",
+  "organizationId": "{{orgId}}"
+}
+
+### Advanced Task Search & Filter
+GET {{baseUrl}}/tasks?organizationId={{orgId}}&status=TODO,IN_PROGRESS&priority=HIGH&page=1&limit=10
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Get Task Details by ID
+GET {{baseUrl}}/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Get Task Activity History
+GET {{baseUrl}}/tasks/{{taskId}}/activity
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Update Task (Status Change / Assignee / Priority)
+PUT {{baseUrl}}/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "status": "IN_PROGRESS",
+  "priority": "HIGH"
+}
+
+### Delete Task (Admin/Owner only)
+DELETE {{baseUrl}}/tasks/{{taskId}}
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### 5. COMMENTS
+
+# Add Comment with @mention
+POST {{baseUrl}}/tasks/{{taskId}}/comments
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+Content-Type: application/json
+
+{
+  "text": "Great work on this! @member@test.com please review the updated components.",
+  "mentions": []
+}
+
+### List Task Comments
+GET {{baseUrl}}/tasks/{{taskId}}/comments
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### 6. AUDIT LOGS
+
+# Get Audit Logs (Admin/Owner only)
+GET {{baseUrl}}/audit-logs?organizationId={{orgId}}&page=1&limit=20
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### 7. NOTIFICATIONS
+
+# Get User Notifications
+GET {{baseUrl}}/notifications
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
+
+### Mark All Notifications Read
+PATCH {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{token}}
+x-organization-id: {{orgId}}
